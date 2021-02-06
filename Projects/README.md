@@ -12,5 +12,3 @@ The contents of this file should follow the format:
 
 The lists of projects that require this are:
 `hyp_parse_everything.py`
-``
-``
