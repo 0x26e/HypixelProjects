@@ -95,15 +95,19 @@ def getAllStats(url):
             # Return proper stats container
             return(finalized_stats)
 
-
+# Get API key from API_KEY.json
 API_FILE = open("API_KEY.json", "r")
 API_KEY = json.loads(API_FILE.read())["API_KEY"]
 
+# Player to test
 NAME = "Hyplex"
+# UUID of player to test
 UUID = "bec9029b-efb3-4c85-925d-f2e97640cf92"
 
+# URL for Hypixel player endpoint
 URL = f"https://api.hypixel.net/player?key={API_KEY}&uuid={UUID}"
 
+# List of gamemodes
 hypixel_stats_gamemodes = {"SuperSmash": ("smash_heroes", getSmashHeroes)}
 
 reformed_stats = getAllStats(URL)
