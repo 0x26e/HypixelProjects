@@ -13,8 +13,18 @@ def get_total_keys(data):
     nested_keys = sum(get_total_keys(value) for key, value in data.items())
     return len(data) + nested_keys
 
+# Get number of bytes from nested dict/lists
+def get_total_bytes(data):
+
+    if not isinstance(data, dict):
+        return sys.getsizeof(data)
+
+    nested_bytes = sum(get_total_keys(value) for key, value in data.items())
+    return sys.getsizeof(data) + nested_bytes
+
 
 # ! # Known bugs: deaths from other kits are all the same?
+# ! # Add stats from achievements
 # Returns formatted Smash Heroes Stats
 def getSmashHeroes(raw_stats, achievements):
 
@@ -145,6 +155,7 @@ def getSmashHeroes(raw_stats, achievements):
 
 
 # ! # Known bugs: Losses need to be fixed
+# ! # Add stats from achievements
 # Returns formatted Bedwars stats
 def getBedwars(raw_stats, achievements):
 
@@ -283,6 +294,58 @@ def getBedwars(raw_stats, achievements):
     return sorted_stats
 
 
+# Returns formatted Quake stats
+# ! # Add stats from achievements
+# ! # Add shop stats
+def getQuake(raw_stats, achievements):
+
+    # Setup container to hold stats
+    sorted_stats = {}
+
+    # List of active stats
+    quake_active_stats = {"barrel": "barrel", "case": "case", "killsound": "killsound", "sight": "laser",
+        "muzzle": "muzzle", "beam": "beam", "selectedKillPrefix": "prefix_color",
+        }
+
+    # List of gamemodes
+    quake_gamemodes = {"teams": "teams", "solo_tourney": "tournament"}
+
+    # Setup general stat names
+    quake_stat_names = ("coins", "kills", "deaths", "killstreaks", "wins", "highest_killstreak", "headshots", "distance_travelled", "shots_fired",
+        "dash_cooldown", "dash_power", "weekly_kills_a", "weekly_kills_b", "monthly_kills_a", "monthly_kills_b"
+        )
+
+    # Setup mode stats
+    quake_mode_stats = ("kills", "deaths", "killstreaks", "wins", "headshots", "distance_travelled", "shots_fired")
+
+    # Set general stats
+    sorted_stats["general"] = {
+        q_stat: int(raw_stats.get(q_stat, 0))
+        for q_stat in quake_stat_names
+        }
+
+    # Set gamemode stats
+    for gm, gm_proper in quake_gamemodes.items():
+        sorted_stats[gm_proper] = {
+            q_stat: raw_stats.get(f"{q_stat}_{gm}", 0)
+            for q_stat in quake_mode_stats
+            }
+
+    # Set active stats
+    sorted_stats["active"] = {
+        q_stat_proper: raw_stats.get(q_stat, 0)
+        for q_stat, q_stat_proper in quake_active_stats.items()
+        }
+
+    # Fix post_update stats
+    sorted_stats["general"]["post_update_kills"] = raw_stats.get("kills_since_update_feb_2017", 0)
+    sorted_stats["teams"]["post_update_kills"] = raw_stats.get("kills_since_update_feb_2017_teams", 0)
+
+    # Return cleaned up stats
+    return sorted_stats
+
+
+
 # Gets all player stats
 def getAllStats(url):
 
@@ -334,15 +397,19 @@ API_KEY = json.loads(API_FILE.read())["API_KEY"]
 
 # Players for testing
 known_players = {
+    "Global":
+    ( ("greaneye", "1fc7b5e6-c8e1-433b-a41e-7013ab0a3582"), ),
     "SmashHeroes":
     ( ("Hyplex", "bec9029b-efb3-4c85-925d-f2e97640cf92"),
     ("Focus_Energy", "2de27887-dbb9-4154-8a36-029d6de5f468") ),
     "Bedwars":
     ( ("TheCleb", "ed6dd177-717a-43b3-b17b-f02031cfac4e"), ),
+    "Quake":
+    ( ("Govo", "511a4cd1-138b-45b9-8d39-3680454bd6e3"), ),
     }
 
 # Select player for testing
-player_to_test = ("Bedwars", 0)
+player_to_test = ("Global", 0)
 
 # Player to test
 NAME = known_players[player_to_test[0]][player_to_test[1]][0]
@@ -356,8 +423,9 @@ URL = f"https://api.hypixel.net/player?key={API_KEY}&uuid={UUID}"
 
 # List of gamemodes
 hypixel_stats_gamemodes = {
-    #"SuperSmash": ("smash_heroes", getSmashHeroes),
-    "Bedwars": ("bedwars", getBedwars)
+    "SuperSmash": ("smash_heroes", getSmashHeroes),
+    "Bedwars": ("bedwars", getBedwars),
+    "Quake": ("quake", getQuake),
     }
 
 reformed_stats = getAllStats(URL)
@@ -366,4 +434,4 @@ pprint(reformed_stats)
 
 print("Total stats parsed: ", get_total_keys(reformed_stats))
 
-print("Total bytes stored: ", sys.getsizeof(reformed_stats))
+print("Total bytes stored: ", get_total_bytes(reformed_stats))
