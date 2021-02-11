@@ -25,24 +25,14 @@ for data in grequests.map([resp]):
         for gm in data["achievements"]:
 
             # For every one-time achievement in that gamemode
-            for ach in data["achievements"][gm]["one_time"]:
-
-                # Temporary Achievement link to simplify
-                achievement = data["achievements"][gm]["one_time"][ach]
+            for ach, achievement in data["achievements"][gm]["one_time"].items():
 
                 # Filter for adding played unlocked percentages
-                if("gamePercentUnlocked" in achievement):
-                    game_percent_unlocked = achievement["gamePercentUnlocked"]
-                else:
-                    game_percent_unlocked = 101
-
-                if("globalPercentUnlocked" in achievement):
-                    global_percent_unlocked = achievement["globalPercentUnlocked"]
-                else:
-                    global_percent_unlocked = 101
+                game_percent_unlocked = achievement.get("gamePercentUnlocked", 101)
+                global_percent_unlocked = achievement.get("globalPercentUnlocked", 101)
 
                 # Temporary achievement object
-                current_ach = (gm, achievement["name"], achievement["description"], global_percent_unlocked, game_percent_unlocked)
+                current_ach = (gm, achievement["name"], achievement["description"], game_percent_unlocked, global_percent_unlocked)
 
                 # Add achievement to achievements list container
                 ach_list.append(current_ach)
@@ -50,9 +40,15 @@ for data in grequests.map([resp]):
 # Sort by "played" (local) percentage:
 ach_list.sort(key=lambda tup: tup[3])
 
+# Feedback
+print("Top 5 rarest achievements (local):")
+
 # Show top 5
 for i in range(5):
     print(ach_list[i])
+
+# Feedback
+print("Top 5 rarest achievements (global):")
 
 # Sort by global percentage
 ach_list.sort(key=lambda tup: tup[4])
