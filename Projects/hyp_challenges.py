@@ -41,15 +41,5 @@ for data in grequests.map([resp]):
 # Show all possible rewards from a challlenge
 print(possible_rewards)
 
-
-
-
-
-
-
-
-
-
-
-
-#
+# Show all challenges
+print(challenge_list)
