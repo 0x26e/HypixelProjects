@@ -51,15 +51,3 @@ print(possible_rewards)
 
 # Show all possible objectives for a quest
 print(possible_objectives)
-
-
-
-
-
-
-
-
-
-
-
-#
