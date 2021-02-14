@@ -109,13 +109,13 @@ def getSmashHeroes(raw_stats, achievements):
 
         # Add stats with default as 0
         sorted_stats[smash_class_proper]["overall"] = {
-            smash_stat: raw_stats["class_stats"][smash_class].get(smash_stat, 0)
+            smash_stat: CLASS_STATS[smash_class].get(smash_stat, 0)
             for smash_stat in smash_class_stats
             }
 
         # Add proper class stats with default as 0
         sorted_stats[smash_class_proper]["overall"].update({
-            smash_stat_proper: raw_stats["class_stats"][smash_class].get( smash_stat, 0)
+            smash_stat_proper: CLASS_STATS[smash_class].get( smash_stat, 0)
             for smash_stat, smash_stat_proper in smash_class_stat_conversions.items()
             })
 
@@ -127,28 +127,46 @@ def getSmashHeroes(raw_stats, achievements):
 
         # For every gamemode in gamemodes
         for gm, gm_proper in smash_gamemodes.items():
-
             # Add gamemode-specific stats with default as 0
             sorted_stats[smash_class_proper][gm_proper] = {
-                smash_stat: raw_stats["class_stats"][smash_class].get( f"{smash_stat}_{gm}", 0)
+                smash_stat: CLASS_STATS[smash_class].get( f"{smash_stat}_{gm}", 0)
                 for smash_stat in smash_class_stats
-                }
+            }
 
-        # For every class
-        for c_smash_class, smash_class_abilities in smash_classes_abilities.items():
+        """
+        class_deaths = {
+            class_name_1: {
+                class_1: total_deaths_to_class_1,
+                class_2: total_deaths_to_class_2,
+                ...,
+                class_n: total_deaths_to_class_n,
+            },
+            class_name_2: {
+                class_1: total_deaths_to_class_1,
+                class_2: total_deaths_to_class_2,
+                ...,
+                class_n: total_deaths_to_class_n,
+            },
+            ...,
+        }
+        """
+        def get_total_deaths_by_class(class_stats, killer_class):
+            """
+            class_stats: stats of the class which we want the total deaths of
+            killer_class: the class that killed the class of `class_stats`
+            """
+            return sum(
+                class_stats.get(ability, {}).get("smashed", 0)
+                for ability in smash_classes_abilities.get(killer_class, {})
+            )
 
-            # For every class, initialize the death counter
-            sorted_stats[smash_class_proper]["class_deaths"][smash_classes[c_smash_class]] = 0
+        for c_smash_class, smash_class_proper in smash_classes.items():
+            class_stats = RAW_STATS[c_smash_class]
 
-            # For every ability
-            for ability in smash_class_abilities:
-
-                # Add deaths to death counter if possible
-                if(ability in raw_stats["class_stats"][c_smash_class]):
-                    sorted_stats[smash_class_proper]["class_deaths"][smash_classes[c_smash_class]] += raw_stats["class_stats"][c_smash_class][ability].get( "smashed", 0)
-
-            print(smash_class_proper, c_smash_class, sorted_stats[smash_class_proper]["class_deaths"][smash_classes[c_smash_class]])
-
+            sorted_stats[smash_class_proper]["class_deaths"] = {
+                killer_class: get_total_deaths_by_class(class_stats, killer_class)
+                for killer_class in smash_classes
+            }
 
     # Return cleaned up stats
     return sorted_stats
