@@ -102,7 +102,7 @@ def getSmashHeroes(raw_stats, achievements):
     sorted_stats.update({
         smash_class_proper: {"class_deaths": {}}
         for smash_class, smash_class_proper in smash_classes.items()
-        })
+    })
 
     # For every class in smash classes
     for smash_class, smash_class_proper in smash_classes.items():
@@ -135,19 +135,10 @@ def getSmashHeroes(raw_stats, achievements):
 
         """
         class_deaths = {
-            class_name_1: {
                 class_1: total_deaths_to_class_1,
                 class_2: total_deaths_to_class_2,
                 ...,
                 class_n: total_deaths_to_class_n,
-            },
-            class_name_2: {
-                class_1: total_deaths_to_class_1,
-                class_2: total_deaths_to_class_2,
-                ...,
-                class_n: total_deaths_to_class_n,
-            },
-            ...,
         }
         """
         def get_total_deaths_by_class(class_stats, killer_class):
