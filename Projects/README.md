@@ -9,3 +9,5 @@ The contents of this file should follow the format:
     "API_KEY": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" # Insert your API key here
 }
 ```
+Projects that require this are as follows:
+ - `hyp_package_parser.py`
